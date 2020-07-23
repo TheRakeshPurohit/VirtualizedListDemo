@@ -1,58 +1,84 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Dimensions,
-  SafeAreaView,
   VirtualizedList,
-  StatusBar,
 } from 'react-native';
+import axios from 'axios';
 
 export default function App() {
-  const DATA = [];
+  const [data, setData] = useState([]);
+  var extradata = [];
+  const [page, setPage] = useState(1);
 
-  const getItem = (data, index) => {
-    return {
-      id: Math.random().toString(12).substring(0),
-      title: `Item ${index + 1}`,
-    };
+  useEffect(() => {
+    axios
+      .get('https://jsonplaceholder.typicode.com/posts?_limit=10&_page=' + page)
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((err) => {
+        console.warn('Error:', err);
+      });
+  }, [page]);
+
+  const loadmore = async () => {
+    setPage(page + 1);
+    console.warn('now page no is ', page);
+    await axios
+      .get('https://jsonplaceholder.typicode.com/posts?_limit=10&_page=' + page)
+      .then((res) => {
+        setData(res.data.concat());
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.warn('Error:', err);
+      });
   };
-
-  const getItemCount = (data) => {
-    return 50;
-  };
-
-  const Item = ({title}) => {
+  const Item = ({item}) => {
     return (
       <View style={styles.item}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.body}>{item.body}</Text>
       </View>
     );
   };
 
+  const getItem = (data1, index) => {
+    return {
+      title: data[index].title,
+      body: data[index].body,
+    };
+  };
+
+  const getItemCount = () => {
+    return Object.keys(data).length;
+  };
+
   return (
     <View style={styles.screen}>
-      <SafeAreaView style={styles.container}>
-        <VirtualizedList
-          data={DATA}
-          initialNumToRender={4}
-          renderItem={({item}) => <Item title={item.title} />}
-          keyExtractor={(item) => item.key}
-          getItemCount={getItemCount}
-          getItem={getItem}
-        />
-      </SafeAreaView>
+      <VirtualizedList
+        data={data}
+        initialNumToRender={4}
+        renderItem={({item}) => <Item item={item} />}
+        keyExtractor={(item) => item.userId}
+        getItemCount={getItemCount}
+        getItem={getItem}
+        //pagingEnabled={true}
+        onScrollEndDrag={loadmore}
+        onEndReached={loadmore}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-    //width: Dimensions.get('window').width,
-    //height: Dimensions.get('window').height,
-    //marginTop: StatusBar.height,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    paddingBottom: '6%',
   },
   item: {
     backgroundColor: '#f9c2ff',
@@ -63,6 +89,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 18,
+  },
+  body: {
+    fontSize: 12,
   },
 });
