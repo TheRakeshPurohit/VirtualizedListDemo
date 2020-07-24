@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -48,7 +48,7 @@ export default function App() {
     }
     setLoading(false);
   };
-  const Item = ({item}) => {
+  const Item = ({ item }) => {
     return (
       <View style={styles.item}>
         <Text style={styles.title}>{item.title}</Text>
@@ -71,7 +71,7 @@ export default function App() {
   const FooterList = () => {
     return (
       <View>
-        <Text style={{textAlign: 'center'}}>Loading ... </Text>
+        <Text style={{ textAlign: 'center' }}>Loading ... </Text>
         <ActivityIndicator loading={Loading} size="large" />
       </View>
     );
@@ -81,7 +81,7 @@ export default function App() {
       <VirtualizedList
         data={data}
         initialNumToRender={4}
-        renderItem={({item}) => <Item item={item} />}
+        renderItem={({ item }) => <Item item={item} />}
         keyExtractor={(item) => item.Id}
         getItemCount={getItemCount}
         getItem={getItem}
