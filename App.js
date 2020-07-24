@@ -5,6 +5,7 @@ import {
   View,
   Dimensions,
   VirtualizedList,
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 
@@ -12,6 +13,7 @@ export default function App() {
   const [data, setData] = useState([]);
   const [newdata, setNewData] = useState([]);
   const [page, setPage] = useState(2);
+  const [Loading, setLoading] = useState(false);
 
   useEffect(() => {
     axios
@@ -25,9 +27,10 @@ export default function App() {
   }, []);
 
   const loadmore = async () => {
+    setLoading(true);
     setPage((prevPage) => prevPage + 1);
     if (page <= 10) {
-      console.warn('now page no is ', page);
+      //console.warn('now page no is ', page);
       await axios
         .get(
           'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=' + page,
@@ -36,8 +39,8 @@ export default function App() {
           //setData(res.data.concat());
           setNewData(res.data);
           Array.prototype.push.apply(data, res.data);
-          console.warn('newdata', newdata);
-          console.warn('data', data);
+          //console.warn('newdata', newdata);
+          //console.warn('data', data);
         })
         .catch((err) => {
           console.warn('Error:', err);
@@ -64,6 +67,14 @@ export default function App() {
     return Object.keys(data).length;
   };
 
+  const FooterList = () => {
+    return (
+      <View>
+        <Text style={{textAlign: 'center'}}>Loading ... </Text>
+        <ActivityIndicator loading={Loading} size="large" />
+      </View>
+    );
+  };
   return (
     <View style={styles.screen}>
       <VirtualizedList
@@ -75,7 +86,8 @@ export default function App() {
         getItem={getItem}
         //pagingEnabled={true}
         //onEndReached={loadmore}
-        onMomentumScrollEnd={loadmore}
+        onEndReached={loadmore}
+        ListFooterComponent={FooterList}
         //onScrollAnimationEnd={loadmore}
       />
     </View>
