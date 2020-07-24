@@ -8,41 +8,24 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
-export default function App() {
+export default class App() extends  {
   const [data, setData] = useState([]);
-  const [newdata, setNewData] = useState([]);
-  const [page, setPage] = useState(2);
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    axios
-      .get('https://jsonplaceholder.typicode.com/posts?_limit=10&_page=1')
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((err) => {
-        console.warn('Error:', err);
-      });
-  }, []);
+  axios
+    .get('https://jsonplaceholder.typicode.com/posts?_limit=10&_page=' + page)
+    .then((res) => {
+      setData(res.data);
+    })
+    .catch((err) => {
+      console.warn('Error:', err);
+    });
 
-  const loadmore = async () => {
-    setPage((prevPage) => prevPage + 1);
-    if (page <= 10) {
-      console.warn('now page no is ', page);
-      await axios
-        .get(
-          'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=' + page,
-        )
-        .then((res) => {
-          //setData(res.data.concat());
-          setNewData(res.data);
-          Array.prototype.push.apply(data, res.data);
-          console.warn('newdata', newdata);
-          console.warn('data', data);
-        })
-        .catch((err) => {
-          console.warn('Error:', err);
-        });
-    }
+  const loadmore = () => {
+    setPage((prevState) => {
+      prevState + 1;
+    });
+    console.log(page);
   };
   const Item = ({item}) => {
     return (
@@ -73,10 +56,8 @@ export default function App() {
         keyExtractor={(item) => item.Id}
         getItemCount={getItemCount}
         getItem={getItem}
-        //pagingEnabled={true}
         //onEndReached={loadmore}
         onMomentumScrollEnd={loadmore}
-        //onScrollAnimationEnd={loadmore}
       />
     </View>
   );
