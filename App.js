@@ -27,9 +27,9 @@ export default function App() {
   }, []);
 
   const loadmore = async () => {
-    setLoading(true);
     setPage((prevPage) => prevPage + 1);
     if (page <= 10) {
+      setLoading(true);
       //console.warn('now page no is ', page);
       await axios
         .get(
@@ -46,6 +46,7 @@ export default function App() {
           console.warn('Error:', err);
         });
     }
+    setLoading(false);
   };
   const Item = ({item}) => {
     return (
